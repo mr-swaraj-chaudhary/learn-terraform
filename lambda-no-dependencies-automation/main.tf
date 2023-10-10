@@ -43,30 +43,17 @@ resource "aws_iam_role_policy_attachment" "attach_iam_policy_to_iam_role" {
     policy_arn  = aws_iam_policy.lambda_policy.arn
 }
 
-data "archive_file" "zip_the_python_code" {
+data "archive_file" "lambda_zip" {
     type        = "zip"
-    source_dir  = "${path.module}/python/"
-    output_path = "${path.module}/python/lambda-automation-test-swaraj.zip"
+    source_dir  = "${path.module}/code/"
+    output_path = "${path.module}/lambda.zip"
 }
 
-resource "aws_lambda_function" "terraform_lambda_func" {
-    filename                       = "${path.module}/python/lambda-automation-test-swaraj.zip"
-    function_name                  = "Lambda-Automation-Test-Function"
+resource "aws_lambda_function" "lambda" {
+    filename                       = data.archive_file.lambda_zip.output_path
+    function_name                  = "lambda-no-dependencies-automation"
     role                           = aws_iam_role.lambda_role.arn
-    handler                        = "lambda-automation-test-swaraj.lambda_handler"
+    handler                        = "lambda.lambda_handler"
     runtime                        = "python3.11"
-    depends_on                     = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
-}
-
-
-output "teraform_aws_role_output" {
-    value = aws_iam_role.lambda_role.name
-}
-
-output "teraform_aws_role_arn_output" {
-    value = aws_iam_role.lambda_role.arn
-}
-
-output "teraform_logging_arn_output" {
-    value = aws_iam_policy.lambda_policy.arn
+    depends_on                     = [ aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role ]
 }

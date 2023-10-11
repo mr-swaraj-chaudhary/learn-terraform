@@ -5,4 +5,6 @@ terraform.tfstate.backup
 terraform.tfvars
 terraform.tfvars.json
 .terraform.lock.hcl
+..terraform.tfstate.lock.info
 .idea
+dependencies/
